@@ -1,0 +1,58 @@
+# Practical no.09
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import DBSCAN
+
+
+# Load dataset
+df = pd.read_csv("Mall_Customers - Mall_Customers.csv")
+print(df.head())
+print(df.shape)
+
+
+# Select features
+X = df[['Annual Income (k$)', 'Spending Score (1-100)']]
+print(X.head())
+
+
+# Scaling
+X_scaled = StandardScaler().fit_transform(X)
+print(X.head())
+
+
+# DBSCAN Clustering
+db = DBSCAN(eps=0.3, min_samples=5)
+df['Cluster'] = db.fit_predict(X_scaled)
+
+
+# Clusters and noise
+labels = df['Cluster']
+print("Number of clusters:", len(set(labels)) - (1 if -1 in labels else 0))
+print("Number of noise points:", list(labels).count(-1))
+print("Noise Points:")
+print(df[df['Cluster'] == -1])
+
+
+# Graph 1
+sns.scatterplot(data=df, x='Annual Income (k$)',
+                y='Spending Score (1-100)',
+                hue='Cluster', palette='tab10', s=100)
+plt.title("DBSCAN Clustering - Mall Customers")
+plt.show()
+
+
+# Graph 2: Clusters and Noise
+clustered = df[df['Cluster'] != -1]
+noise = df[df['Cluster'] == -1]
+plt.scatter(clustered.iloc[:, 3], clustered.iloc[:, 4],
+            c=clustered['Cluster'], cmap='viridis', s=100)
+plt.scatter(noise.iloc[:, 3], noise.iloc[:, 4],
+            color='red', marker='x', s=150, label='Noise')
+plt.title("DBSCAN Clustering with Noise Points")
+plt.xlabel("Annual Income")
+plt.ylabel("Spending Score")
+plt.legend()
+plt.show()

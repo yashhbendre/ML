@@ -1,0 +1,97 @@
+import pandas as pd
+import numpy as np
+-------------------
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+-----------------------------------------------
+df = pd.read_csv(    )
+------------------------------------------------
+df.head()
+------------------------------------------------
+df.info()
+------------------------------------------------
+df.isnull().sum()
+------------------------------------------------
+df = df[
+    [
+        'Pclass',
+        'Sex',
+        'Age',
+        'SibSp',
+        'Parch',
+        'Fare',
+        'Embarked',
+        'Survived'
+    ]
+]
+------------------------------------------------
+
+X = df.drop('Survived', axis=1)
+y = df['Survived']
+------------------------------------------------
+numeric_features = [
+    'Age',
+    'Fare',
+    'SibSp',
+    'Parch'
+]
+------------------------------------------------
+
+categorical_features = [
+    'Sex',
+    'Embarked',
+    'Pclass'
+]
+
+
+------------------------------------------------
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='mean')),
+    ('scaler', StandardScaler())
+])
+
+------------------------------------------------
+
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('encoder', OneHotEncoder(handle_unknown='ignore'))
+])
+
+
+------------------------------------------------
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ]
+)
+
+------------------------------------------------
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42
+)
+------------------------------------------------
+
+
+X_train_processed = preprocessor.fit_transform(X_train)
+X_test_processed = preprocessor.transform(X_test)
+------------------------------------------------
+
+
+print("Original Shape:", X_train.shape)
+print("Processed Shape:", X_train_processed.shape)
+
+------------------------------------------------
+
+print("Feature Engineering Completed Successfully")
+------------------------------------------------
+
+
